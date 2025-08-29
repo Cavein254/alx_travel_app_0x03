@@ -1,0 +1,30 @@
+# Virtual environment
+/env/
+/venv/
+
+# Bytecode files
+*.pyc
+__pycache__/
+
+# Database
+db.sqlite3
+
+# Local settings
+local_settings.py
+
+# Media and Static files (generated)
+/media/
+/static_root/
+
+# Log files
+*.log
+
+# IDE/Editor specific files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Operating System specific files
+.DS_Store
+Thumbs.db

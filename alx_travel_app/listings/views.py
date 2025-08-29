@@ -7,6 +7,7 @@ import requests, uuid, os
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from .tasks import send_booking_confirmation_email
 
 CHAPA_URL = f"{settings.CHAPA_BASE_URL}/transaction"
 class UserViewSet(viewsets.ModelViewSet):
@@ -55,6 +56,21 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(sender=self.request.user)
+
+class BookingViewSet(viewsets.ModelViewSet):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+
+    def perform_create(self, serializer):
+        booking = serializer.save()
+        # Trigger async task
+        send_booking_confirmation_email.delay(
+            booking.user.email,
+            booking.property.name,
+            booking.start_date.strftime("%Y-%m-%d"),
+            booking.end_date.strftime("%Y-%m-%d"),
+            str(booking.total_price),
+        )
 
 @api_view(["POST"])
 def initiate_payment(request, booking_id):
